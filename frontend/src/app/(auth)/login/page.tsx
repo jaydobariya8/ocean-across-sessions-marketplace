@@ -1,11 +1,12 @@
 'use client'
 
+import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
 const API = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost'
 
-export default function LoginPage() {
+function LoginContent() {
   const params = useSearchParams()
   const error = params.get('error')
 
@@ -63,6 +64,18 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-blue-100">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600" />
+      </div>
+    }>
+      <LoginContent />
+    </Suspense>
   )
 }
 
