@@ -1,5 +1,7 @@
+from django.shortcuts import redirect
+from django.conf import settings
 from rest_framework import generics, status
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenRefreshView
@@ -40,3 +42,22 @@ class SwitchRoleView(APIView):
         request.user.role = role
         request.user.save(update_fields=['role'])
         return Response({'role': role})
+
+
+class OAuthCallbackView(APIView):
+    """
+    Called by social-django after successful OAuth.
+    Reads JWT from session, redirects to frontend with tokens in URL params.
+    Frontend extracts tokens, stores in cookies, redirects to dashboard.
+    """
+    permission_classes = []
+
+    def get(self, request):
+        access = request.session.pop('oauth_access', None)
+        refresh = request.session.pop('oauth_refresh', None)
+
+        if not access or not refresh:
+            return redirect(f"{settings.FRONTEND_URL}/login?error=oauth_failed")
+
+        frontend_url = f"{settings.FRONTEND_URL}/auth/callback"
+        return redirect(f"{frontend_url}?access={access}&refresh={refresh}")

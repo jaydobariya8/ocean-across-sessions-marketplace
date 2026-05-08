@@ -164,11 +164,15 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.load_extra_data',
     'social_core.pipeline.user.user_details',
     'apps.accounts.pipeline.save_avatar',
+    'apps.accounts.pipeline.issue_jwt',
 )
 
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/dashboard'
-SOCIAL_AUTH_NEW_USER_REDIRECT_URL = '/dashboard'
+# After OAuth, Django redirects here — view reads JWT from session, redirects to frontend
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/api/auth/oauth/callback/'
+SOCIAL_AUTH_NEW_USER_REDIRECT_URL = '/api/auth/oauth/callback/'
 SOCIAL_AUTH_LOGIN_ERROR_URL = '/login?error=oauth'
+
+FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:3000')
 
 # MinIO / S3
 AWS_ACCESS_KEY_ID = config('MINIO_ACCESS_KEY', default='minioadmin')
