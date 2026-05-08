@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { format } from 'date-fns'
 import toast from 'react-hot-toast'
 import { api } from '@/lib/api'
@@ -35,6 +35,8 @@ function toLocalDatetimeValue(iso: string) {
 export default function SessionForm({ open, onClose, session, onSaved }: Props) {
   const isEdit = !!session
   const [saving, setSaving] = useState(false)
+  const [uploadingImage, setUploadingImage] = useState(false)
+  const imageInputRef = useRef<HTMLInputElement>(null)
   const [form, setForm] = useState<FormData>({
     title: '', description: '', category: 'coaching',
     price: '', duration_minutes: '60', max_participants: '1',
@@ -60,6 +62,25 @@ export default function SessionForm({ open, onClose, session, onSaved }: Props) 
 
   const set = (field: keyof FormData) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setForm((f) => ({ ...f, [field]: e.target.value }))
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploadingImage(true)
+    try {
+      const fd = new FormData()
+      fd.append('image', file)
+      const { data } = await api.post('/auth/upload/session-image/', fd, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+      setForm((f) => ({ ...f, image: data.image }))
+      toast.success('Image uploaded.')
+    } catch {
+      toast.error('Image upload failed.')
+    } finally {
+      setUploadingImage(false)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -129,6 +150,20 @@ export default function SessionForm({ open, onClose, session, onSaved }: Props) 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Max Spots</label>
             <input type="number" className="input" value={form.max_participants} onChange={set('max_participants')} required min="1" />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Session Image</label>
+          <div className="flex items-center gap-3">
+            {form.image && (
+              <img src={form.image} alt="" className="w-16 h-12 rounded-lg object-cover border border-gray-200" />
+            )}
+            <button type="button" onClick={() => imageInputRef.current?.click()}
+              className="btn-secondary text-sm px-3 py-1.5">
+              {uploadingImage ? 'Uploading...' : form.image ? 'Change Image' : 'Upload Image'}
+            </button>
+            <input ref={imageInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
           </div>
         </div>
 
