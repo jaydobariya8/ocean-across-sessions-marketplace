@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'apps.sessions',
     'apps.bookings',
     'apps.payments',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
