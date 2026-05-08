@@ -20,7 +20,7 @@ class Booking(models.Model):
         related_name='bookings'
     )
     session = models.ForeignKey(
-        'sessions.Session',
+        'coaching_sessions.Session',
         on_delete=models.CASCADE,
         related_name='bookings'
     )

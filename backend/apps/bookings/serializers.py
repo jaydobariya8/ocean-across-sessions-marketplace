@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Booking
+from apps.sessions.models import Session
 from apps.sessions.serializers import SessionSerializer
 from apps.accounts.serializers import UserPublicSerializer
 
@@ -8,7 +9,7 @@ class BookingSerializer(serializers.ModelSerializer):
     session = SessionSerializer(read_only=True)
     user = UserPublicSerializer(read_only=True)
     session_id = serializers.PrimaryKeyRelatedField(
-        queryset=__import__('apps.sessions.models', fromlist=['Session']).Session.objects.all(),
+        queryset=Session.objects.all(),
         source='session',
         write_only=True
     )

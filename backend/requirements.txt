@@ -14,3 +14,7 @@ django-ratelimit==4.1.0
 django-filter==24.2
 gunicorn==22.0.0
 whitenoise==6.7.0
+# Dev/test
+pytest==8.2.2
+pytest-django==4.8.0
+Faker==25.8.0
