@@ -9,6 +9,7 @@ export interface User {
   role: Role
   avatar: string | null
   bio: string
+  oauth_provider: string | null
 }
 
 export type SessionStatus = 'draft' | 'published' | 'cancelled'
