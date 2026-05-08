@@ -4,11 +4,13 @@ from rest_framework.response import Response
 from .models import Booking
 from .serializers import BookingSerializer, BookingStatusSerializer
 from apps.accounts.permissions import IsCreator
+from apps.accounts.throttles import BookingRateThrottle
 
 
 class BookingListCreateView(generics.ListCreateAPIView):
     serializer_class = BookingSerializer
     permission_classes = [IsAuthenticated]
+    throttle_classes = [BookingRateThrottle]
 
     def get_queryset(self):
         qs = Booking.objects.select_related('session', 'session__creator', 'user')

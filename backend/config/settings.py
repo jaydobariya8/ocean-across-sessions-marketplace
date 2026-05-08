@@ -114,6 +114,7 @@ REST_FRAMEWORK = {
         'user': '60/minute',
         'auth': '10/minute',
         'booking': '20/minute',
+        'upload': '10/minute',
     },
 }
 

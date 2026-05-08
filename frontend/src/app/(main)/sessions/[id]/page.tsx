@@ -9,6 +9,7 @@ import { api } from '@/lib/api'
 import { useAuth } from '@/hooks/useAuth'
 import Badge from '@/components/ui/Badge'
 import Spinner from '@/components/ui/Spinner'
+import CheckoutModal from '@/components/bookings/CheckoutModal'
 import type { Session, Booking } from '@/types'
 
 const CATEGORY_COLOR: Record<string, 'blue' | 'green' | 'purple' | 'yellow' | 'gray'> = {
@@ -26,6 +27,8 @@ export default function SessionDetailPage() {
   const [loading, setLoading] = useState(true)
   const [booking, setBooking] = useState(false)
   const [alreadyBooked, setAlreadyBooked] = useState(false)
+  const [checkoutOpen, setCheckoutOpen] = useState(false)
+  const [pendingBookingId, setPendingBookingId] = useState<number | null>(null)
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -54,9 +57,15 @@ export default function SessionDetailPage() {
     }
     setBooking(true)
     try {
-      await api.post('/bookings/', { session_id: session!.id })
-      setAlreadyBooked(true)
-      toast.success('Session booked! Check your dashboard.')
+      const { data } = await api.post('/bookings/', { session_id: session!.id })
+      // Free session → confirmed immediately; paid → open Stripe checkout
+      if (Number(session!.price) === 0) {
+        setAlreadyBooked(true)
+        toast.success('Session booked!')
+      } else {
+        setPendingBookingId(data.id)
+        setCheckoutOpen(true)
+      }
     } catch (err: any) {
       const msg = err?.response?.data?.non_field_errors?.[0] || err?.response?.data?.detail || 'Booking failed.'
       toast.error(msg)
@@ -200,6 +209,16 @@ export default function SessionDetailPage() {
           </div>
         </div>
       </div>
+
+      {session && pendingBookingId && (
+        <CheckoutModal
+          open={checkoutOpen}
+          onClose={() => setCheckoutOpen(false)}
+          session={session}
+          bookingId={pendingBookingId}
+          onPaid={() => { setAlreadyBooked(true); setPendingBookingId(null) }}
+        />
+      )}
     </div>
   )
 }

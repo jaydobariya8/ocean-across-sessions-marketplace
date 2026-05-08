@@ -10,6 +10,7 @@ from rest_framework_simplejwt.exceptions import TokenError
 from .models import User
 from .serializers import UserSerializer
 from .uploads import upload_file
+from .throttles import AuthRateThrottle, BookingRateThrottle, UploadRateThrottle
 
 
 class CurrentUserView(generics.RetrieveUpdateAPIView):
@@ -48,6 +49,7 @@ class SwitchRoleView(APIView):
 class AvatarUploadView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser]
+    throttle_classes = [UploadRateThrottle]
 
     def post(self, request):
         file = request.FILES.get('avatar')
@@ -70,6 +72,7 @@ class AvatarUploadView(APIView):
 class SessionImageUploadView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser]
+    throttle_classes = [UploadRateThrottle]
 
     def post(self, request):
         file = request.FILES.get('image')
@@ -94,6 +97,7 @@ class OAuthCallbackView(APIView):
     Frontend extracts tokens, stores in cookies, redirects to dashboard.
     """
     permission_classes = []
+    throttle_classes = [AuthRateThrottle]
 
     def get(self, request):
         access = request.session.pop('oauth_access', None)
