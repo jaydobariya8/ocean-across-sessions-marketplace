@@ -25,6 +25,7 @@ interface FormData {
   max_participants: string
   scheduled_at: string
   status: string
+  image: string
 }
 
 function toLocalDatetimeValue(iso: string) {
@@ -40,7 +41,7 @@ export default function SessionForm({ open, onClose, session, onSaved }: Props) 
   const [form, setForm] = useState<FormData>({
     title: '', description: '', category: 'coaching',
     price: '', duration_minutes: '60', max_participants: '1',
-    scheduled_at: '', status: 'draft',
+    scheduled_at: '', status: 'draft', image: '',
   })
 
   useEffect(() => {
@@ -54,9 +55,10 @@ export default function SessionForm({ open, onClose, session, onSaved }: Props) 
         max_participants: String(session.max_participants),
         scheduled_at: toLocalDatetimeValue(session.scheduled_at),
         status: session.status,
+        image: session.image || '',
       })
     } else {
-      setForm({ title: '', description: '', category: 'coaching', price: '', duration_minutes: '60', max_participants: '1', scheduled_at: '', status: 'draft' })
+      setForm({ title: '', description: '', category: 'coaching', price: '', duration_minutes: '60', max_participants: '1', scheduled_at: '', status: 'draft', image: '' })
     }
   }, [session, open])
 
