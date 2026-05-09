@@ -17,7 +17,7 @@ python manage.py migrate --noinput
 python manage.py collectstatic --noinput
 
 echo "Ensuring MinIO bucket..."
-python -c "from apps.accounts.uploads import ensure_bucket; ensure_bucket()" || echo "MinIO not ready, skipping bucket init"
+DJANGO_SETTINGS_MODULE=config.settings python -c "import django; django.setup(); from apps.accounts.uploads import ensure_bucket; ensure_bucket()" || echo "MinIO not ready, skipping bucket init"
 
 exec gunicorn config.wsgi:application \
     --bind 0.0.0.0:8000 \
