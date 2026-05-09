@@ -215,7 +215,8 @@ export default function SessionDetailPage() {
           open={checkoutOpen}
           onClose={async () => {
             setCheckoutOpen(false)
-            if (pendingBookingId) {
+            // only cancel if payment was not completed (paidRef tracked inside modal)
+            if (pendingBookingId && !alreadyBooked) {
               try {
                 await api.patch(`/bookings/${pendingBookingId}/`, { status: 'cancelled' })
               } catch {}
@@ -224,7 +225,10 @@ export default function SessionDetailPage() {
           }}
           session={session}
           bookingId={pendingBookingId}
-          onPaid={() => { setAlreadyBooked(true); setPendingBookingId(null) }}
+          onPaid={() => {
+            setAlreadyBooked(true)
+            setPendingBookingId(null)
+          }}
         />
       )}
     </div>

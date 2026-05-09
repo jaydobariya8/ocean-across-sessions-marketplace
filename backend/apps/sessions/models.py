@@ -47,7 +47,7 @@ class Session(models.Model):
 
     @property
     def current_participants(self):
-        return self.bookings.filter(status__in=['pending', 'confirmed']).count()
+        return self.bookings.filter(status='confirmed').count()
 
     @property
     def is_available(self):

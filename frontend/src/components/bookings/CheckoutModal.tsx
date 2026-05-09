@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import toast from 'react-hot-toast'
@@ -22,9 +22,12 @@ interface Props {
 export default function CheckoutModal({ open, onClose, session, bookingId, onPaid }: Props) {
   const [clientSecret, setClientSecret] = useState<string | null>(null)
   const [loadingIntent, setLoadingIntent] = useState(false)
+  const paidRef = useRef(false)
 
   useEffect(() => {
     if (!open || !bookingId) return
+    paidRef.current = false
+    setClientSecret(null)
     setLoadingIntent(true)
     api.post('/payments/create-intent/', { booking_id: bookingId })
       .then(({ data }) => setClientSecret(data.client_secret))
@@ -40,7 +43,9 @@ export default function CheckoutModal({ open, onClose, session, bookingId, onPai
         <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: 'stripe' } }}>
           <CheckoutForm
             session={session}
+            bookingId={bookingId}
             clientSecret={clientSecret}
+            paidRef={paidRef}
             onPaid={onPaid}
             onClose={onClose}
           />
@@ -50,9 +55,11 @@ export default function CheckoutModal({ open, onClose, session, bookingId, onPai
   )
 }
 
-function CheckoutForm({ session, onPaid, onClose }: {
+function CheckoutForm({ session, bookingId, onPaid, onClose, paidRef }: {
   session: Session
+  bookingId: number
   clientSecret: string
+  paidRef: React.MutableRefObject<boolean>
   onPaid: () => void
   onClose: () => void
 }) {
@@ -77,6 +84,15 @@ function CheckoutForm({ session, onPaid, onClose }: {
       setError(result.error.message || 'Payment failed.')
       setPaying(false)
     } else if (result.paymentIntent?.status === 'succeeded') {
+      try {
+        await api.post('/payments/confirm-payment/', {
+          booking_id: bookingId,
+          payment_intent_id: result.paymentIntent.id,
+        })
+      } catch {
+        // webhook will handle it as fallback
+      }
+      paidRef.current = true
       toast.success('Payment successful! Booking confirmed.')
       onPaid()
       onClose()
@@ -85,7 +101,6 @@ function CheckoutForm({ session, onPaid, onClose }: {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      {/* Order summary */}
       <div className="bg-gray-50 rounded-xl p-4">
         <p className="text-sm text-gray-500">Booking for</p>
         <p className="font-semibold text-gray-900">{session.title}</p>

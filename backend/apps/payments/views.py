@@ -33,6 +33,43 @@ class CreatePaymentIntentView(APIView):
         return Response({'client_secret': intent.client_secret})
 
 
+class ConfirmPaymentView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        from apps.bookings.models import Booking
+        from .models import Payment
+        booking_id = request.data.get('booking_id')
+        payment_intent_id = request.data.get('payment_intent_id')
+
+        try:
+            booking = Booking.objects.get(id=booking_id, user=request.user)
+        except Booking.DoesNotExist:
+            return Response({'detail': 'Booking not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            intent = stripe.PaymentIntent.retrieve(payment_intent_id)
+        except stripe.error.StripeError:
+            return Response({'detail': 'Invalid payment.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if intent.status != 'succeeded':
+            return Response({'detail': 'Payment not completed.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        booking.status = Booking.STATUS_CONFIRMED
+        booking.stripe_payment_id = payment_intent_id
+        booking.save(update_fields=['status', 'stripe_payment_id'])
+
+        Payment.objects.update_or_create(
+            stripe_payment_intent_id=payment_intent_id,
+            defaults={
+                'booking': booking,
+                'amount': intent.amount / 100,
+                'status': 'succeeded',
+            }
+        )
+        return Response({'status': 'confirmed'})
+
+
 @method_decorator(csrf_exempt, name='dispatch')
 class StripeWebhookView(APIView):
     permission_classes = []
