@@ -40,9 +40,15 @@ class BookingSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        validated_data['user'] = self.context['request'].user
-        validated_data['amount_paid'] = validated_data['session'].price
-        return super().create(validated_data)
+        from django.db import transaction
+        user = self.context['request'].user
+        session = validated_data['session']
+        validated_data['user'] = user
+        validated_data['amount_paid'] = session.price
+        if session.price == 0:
+            validated_data['status'] = Booking.STATUS_CONFIRMED
+        with transaction.atomic():
+            return super().create(validated_data)
 
 
 class BookingStatusSerializer(serializers.ModelSerializer):

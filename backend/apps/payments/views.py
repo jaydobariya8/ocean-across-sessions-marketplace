@@ -47,6 +47,10 @@ class ConfirmPaymentView(APIView):
         except Booking.DoesNotExist:
             return Response({'detail': 'Booking not found.'}, status=status.HTTP_404_NOT_FOUND)
 
+        # Intent must match what was stored during create-intent
+        if booking.stripe_payment_id and booking.stripe_payment_id != payment_intent_id:
+            return Response({'detail': 'Payment intent mismatch.'}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
             intent = stripe.PaymentIntent.retrieve(payment_intent_id)
         except stripe.error.StripeError:
@@ -54,6 +58,11 @@ class ConfirmPaymentView(APIView):
 
         if intent.status != 'succeeded':
             return Response({'detail': 'Payment not completed.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Validate metadata ties intent to this booking
+        meta_booking_id = intent.metadata.get('booking_id')
+        if meta_booking_id and str(meta_booking_id) != str(booking.id):
+            return Response({'detail': 'Payment intent mismatch.'}, status=status.HTTP_400_BAD_REQUEST)
 
         booking.status = Booking.STATUS_CONFIRMED
         booking.stripe_payment_id = payment_intent_id

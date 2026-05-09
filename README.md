@@ -182,15 +182,3 @@ python -m pytest tests/ -v
 65 tests covering auth, sessions CRUD, bookings, permissions, capacity limits, OAuth flow, and JWT protection.
 
 ---
-
-## Scoring Coverage
-
-| Category | Points | Status |
-|----------|--------|--------|
-| Architecture & Docker | 20 | ✅ docker-compose, 5 services, one-command start |
-| Auth & Roles | 20 | ✅ GitHub + Google OAuth, JWT, Creator/User roles |
-| Core Features | 30 | ✅ Sessions CRUD, booking flow, dashboards |
-| Frontend UX | 15 | ✅ Responsive, error states, loading states |
-| Code Quality & Docs | 15 | ✅ .env.example, README, typed TypeScript |
-| Bonus (Stripe + MinIO + Rate Limiting) | +15 | ✅ All 3 bonus features |
-| **Total** | **115** | |

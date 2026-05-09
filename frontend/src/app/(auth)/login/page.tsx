@@ -11,56 +11,128 @@ function LoginContent() {
   const error = params.get('error')
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-blue-100">
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
-        {/* Logo / Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-600 rounded-2xl mb-4">
-            <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-            </svg>
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900">Sessions Marketplace</h1>
-          <p className="text-gray-500 mt-1">Sign in to book or create sessions</p>
+    <div className="min-h-screen flex">
+      {/* Left panel — brand */}
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-primary-600 via-primary-700 to-violet-700 flex-col justify-between p-12">
+        {/* Background blobs */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-20 -left-20 w-80 h-80 bg-white/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 right-10 w-64 h-64 bg-violet-400/20 rounded-full blur-2xl" />
         </div>
 
-        {/* Error */}
-        {error && (
-          <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
-            {error === 'oauth_failed'
-              ? 'OAuth sign-in failed. Please try again.'
-              : 'An error occurred. Please try again.'}
+        <div className="relative">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center">
+              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <span className="font-bold text-xl text-white tracking-tight">Sessions<span className="text-primary-200">.</span></span>
           </div>
-        )}
-
-        {/* OAuth Buttons */}
-        <div className="space-y-3">
-          <a
-            href={`${API}/auth/login/github/`}
-            className="flex items-center justify-center gap-3 w-full py-3 px-4 bg-gray-900 hover:bg-gray-800 text-white font-medium rounded-xl transition-colors"
-          >
-            <GitHubIcon />
-            Continue with GitHub
-          </a>
-
-          <a
-            href={`${API}/auth/login/google-oauth2/`}
-            className="flex items-center justify-center gap-3 w-full py-3 px-4 bg-white hover:bg-gray-50 text-gray-700 font-medium rounded-xl border-2 border-gray-200 transition-colors"
-          >
-            <GoogleIcon />
-            Continue with Google
-          </a>
         </div>
 
-        <p className="text-center text-xs text-gray-400 mt-8">
-          By signing in you agree to our terms of service.
-        </p>
+        <div className="relative space-y-8">
+          <div>
+            <h2 className="text-4xl font-extrabold text-white leading-tight mb-4">
+              Your next learning<br/>experience awaits.
+            </h2>
+            <p className="text-primary-100 text-lg leading-relaxed">
+              Connect with expert creators and book live sessions in minutes.
+            </p>
+          </div>
 
-        <div className="mt-4 text-center">
-          <Link href="/" className="text-sm text-primary-600 hover:underline">
-            ← Back to catalog
-          </Link>
+          <div className="space-y-4">
+            {[
+              { icon: '🎯', title: 'Expert Creators', desc: 'Learn from verified professionals' },
+              { icon: '⚡', title: 'Book Instantly', desc: 'Reserve your spot in one click' },
+              { icon: '💳', title: 'Secure Payments', desc: 'Powered by Stripe — always safe' },
+            ].map(({ icon, title, desc }) => (
+              <div key={title} className="flex items-center gap-4">
+                <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-lg flex-shrink-0">
+                  {icon}
+                </div>
+                <div>
+                  <p className="text-white font-semibold text-sm">{title}</p>
+                  <p className="text-primary-200 text-xs">{desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="relative text-primary-300 text-xs">
+          © {new Date().getFullYear()} Sessions Marketplace
+        </div>
+      </div>
+
+      {/* Right panel — login form */}
+      <div className="flex-1 flex items-center justify-center px-6 py-12 bg-slate-50">
+        <div className="w-full max-w-sm">
+          {/* Mobile logo */}
+          <div className="lg:hidden flex items-center gap-2 mb-10">
+            <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl flex items-center justify-center">
+              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <span className="font-bold text-lg text-gray-900">Sessions<span className="text-primary-600">.</span></span>
+          </div>
+
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">Welcome back</h1>
+          <p className="text-gray-500 text-sm mb-8">Sign in to continue to Sessions</p>
+
+          {/* Error */}
+          {error && (
+            <div className="mb-6 flex items-start gap-3 p-4 bg-red-50 border border-red-100 rounded-xl">
+              <svg className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p className="text-sm text-red-600">
+                {error === 'oauth_failed' ? 'OAuth sign-in failed. Please try again.' : 'An error occurred. Please try again.'}
+              </p>
+            </div>
+          )}
+
+          {/* OAuth Buttons */}
+          <div className="space-y-3">
+            <a
+              href={`${API}/auth/login/github/`}
+              className="flex items-center justify-center gap-3 w-full py-3.5 px-5 bg-gray-900 hover:bg-gray-800 active:bg-gray-950 text-white font-semibold rounded-2xl transition-all duration-200 shadow-sm hover:shadow-md"
+            >
+              <GitHubIcon />
+              Continue with GitHub
+            </a>
+
+            <a
+              href={`${API}/auth/login/google-oauth2/`}
+              className="flex items-center justify-center gap-3 w-full py-3.5 px-5 bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-800 font-semibold rounded-2xl border-2 border-gray-200 transition-all duration-200 shadow-sm hover:shadow-md"
+            >
+              <GoogleIcon />
+              Continue with Google
+            </a>
+          </div>
+
+          <div className="flex items-center gap-3 my-8">
+            <div className="flex-1 h-px bg-gray-200" />
+            <span className="text-xs text-gray-400 font-medium">secure OAuth 2.0</span>
+            <div className="flex-1 h-px bg-gray-200" />
+          </div>
+
+          <p className="text-center text-xs text-gray-400">
+            By signing in you agree to our{' '}
+            <span className="text-primary-600 hover:underline cursor-pointer">terms of service</span>
+            {' '}and{' '}
+            <span className="text-primary-600 hover:underline cursor-pointer">privacy policy</span>.
+          </p>
+
+          <div className="mt-8 text-center">
+            <Link href="/" className="text-sm text-gray-500 hover:text-gray-700 flex items-center justify-center gap-1 transition-colors">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Back to catalog
+            </Link>
+          </div>
         </div>
       </div>
     </div>
@@ -70,8 +142,8 @@ function LoginContent() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-blue-100">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600" />
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600" />
       </div>
     }>
       <LoginContent />
