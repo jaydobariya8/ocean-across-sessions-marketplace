@@ -33,7 +33,6 @@ class Booking(models.Model):
     class Meta:
         db_table = 'bookings_booking'
         ordering = ['-booked_at']
-        unique_together = ['user', 'session']
 
     def __str__(self):
         return f'{self.user.username} → {self.session.title} ({self.status})'
