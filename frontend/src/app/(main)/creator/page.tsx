@@ -28,20 +28,18 @@ export default function CreatorDashboardPage() {
 
   useEffect(() => {
     if (!user) return
-    if (tab === 'sessions') {
-      setLoading(true)
-      api.get<PaginatedResponse<Session>>('/sessions/my/?page_size=100')
-        .then(({ data }) => setSessions(data.results))
-        .catch(() => {})
-        .finally(() => setLoading(false))
-    } else {
-      setLoading(true)
-      api.get<PaginatedResponse<Booking>>('/bookings/creator/?page_size=100')
-        .then(({ data }) => setBookings(data.results))
-        .catch(() => {})
-        .finally(() => setLoading(false))
-    }
-  }, [user, tab])
+    setLoading(true)
+    Promise.all([
+      api.get<PaginatedResponse<Session>>('/sessions/my/?page_size=100'),
+      api.get<PaginatedResponse<Booking>>('/bookings/creator/?page_size=100'),
+    ])
+      .then(([sessionsRes, bookingsRes]) => {
+        setSessions(sessionsRes.data.results)
+        setBookings(bookingsRes.data.results)
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [user])
 
   const handleDelete = async (id: number) => {
     if (!confirm('Delete this session? This cannot be undone.')) return
