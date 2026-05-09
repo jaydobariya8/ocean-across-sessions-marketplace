@@ -213,7 +213,15 @@ export default function SessionDetailPage() {
       {session && pendingBookingId && (
         <CheckoutModal
           open={checkoutOpen}
-          onClose={() => setCheckoutOpen(false)}
+          onClose={async () => {
+            setCheckoutOpen(false)
+            if (pendingBookingId) {
+              try {
+                await api.patch(`/bookings/${pendingBookingId}/`, { status: 'cancelled' })
+              } catch {}
+              setPendingBookingId(null)
+            }
+          }}
           session={session}
           bookingId={pendingBookingId}
           onPaid={() => { setAlreadyBooked(true); setPendingBookingId(null) }}

@@ -37,7 +37,7 @@ def upload_file(file_obj, prefix: str, content_type: str) -> str:
         file_obj,
         bucket,
         key,
-        ExtraArgs={'ContentType': content_type, 'ACL': 'public-read'},
+        ExtraArgs={'ContentType': content_type},
     )
 
     endpoint = settings.AWS_S3_ENDPOINT_URL.replace('minio:9000', 'localhost:9000')
