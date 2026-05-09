@@ -17,7 +17,7 @@ export function clearTokens() {
 }
 
 export function isAuthenticated(): boolean {
-  return !!getAccessToken()
+  return !!(Cookies.get('access_token') || Cookies.get('refresh_token'))
 }
 
 export async function fetchCurrentUser(): Promise<User> {
