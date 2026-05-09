@@ -167,6 +167,7 @@ sessions-marketplace/
 | POST | `/api/auth/upload/avatar/` | Auth | Upload avatar to MinIO |
 | POST | `/api/auth/upload/session-image/` | Auth | Upload session image to MinIO |
 | POST | `/api/payments/create-intent/` | User | Create Stripe PaymentIntent |
+| POST | `/api/payments/confirm-payment/` | User | Confirm payment + mark booking confirmed |
 | POST | `/api/payments/webhook/` | - | Stripe webhook (confirms booking) |
 
 ---
