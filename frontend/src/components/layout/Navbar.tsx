@@ -61,6 +61,7 @@ export default function Navbar() {
 
           {/* Desktop Nav */}
           <div className="hidden sm:flex items-center gap-1">
+            <NavLink href="/landing-page" active={isActive('/landing-page')}>Home</NavLink>
             <NavLink href="/" active={isActive('/')}>Explore</NavLink>
             {!loading && user && (
               <>
@@ -144,6 +145,7 @@ export default function Navbar() {
         {/* Mobile menu */}
         {menuOpen && (
           <div className="sm:hidden pb-4 border-t border-gray-100 pt-3 space-y-1 animate-fade-in">
+            <MobileNavLink href="/landing-page" onClick={() => setMenuOpen(false)}>Home</MobileNavLink>
             <MobileNavLink href="/" onClick={() => setMenuOpen(false)}>Explore</MobileNavLink>
             {user ? (
               <>
