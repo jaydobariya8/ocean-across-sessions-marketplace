@@ -32,6 +32,12 @@ export default function SessionDetailPage() {
   const [error, setError] = useState('')
   const paymentSucceededRef = useRef(false)
 
+  const refreshSession = () => {
+    api.get<Session>(`/sessions/${id}/`)
+      .then(({ data }) => setSession(data))
+      .catch(() => {})
+  }
+
   useEffect(() => {
     api.get<Session>(`/sessions/${id}/`)
       .then(({ data }) => setSession(data))
@@ -231,6 +237,7 @@ export default function SessionDetailPage() {
             paymentSucceededRef.current = true
             setAlreadyBooked(true)
             setPendingBookingId(null)
+            refreshSession()
           }}
         />
       )}
