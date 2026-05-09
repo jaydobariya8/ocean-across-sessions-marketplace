@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { format } from 'date-fns'
@@ -30,6 +30,7 @@ export default function SessionDetailPage() {
   const [checkoutOpen, setCheckoutOpen] = useState(false)
   const [pendingBookingId, setPendingBookingId] = useState<number | null>(null)
   const [error, setError] = useState('')
+  const paymentSucceededRef = useRef(false)
 
   useEffect(() => {
     api.get<Session>(`/sessions/${id}/`)
@@ -63,6 +64,7 @@ export default function SessionDetailPage() {
         setAlreadyBooked(true)
         toast.success('Session booked!')
       } else {
+        paymentSucceededRef.current = false
         setPendingBookingId(data.id)
         setCheckoutOpen(true)
       }
@@ -215,17 +217,18 @@ export default function SessionDetailPage() {
           open={checkoutOpen}
           onClose={async () => {
             setCheckoutOpen(false)
-            // only cancel if payment was not completed (paidRef tracked inside modal)
-            if (pendingBookingId && !alreadyBooked) {
+            if (pendingBookingId && !paymentSucceededRef.current) {
               try {
                 await api.patch(`/bookings/${pendingBookingId}/`, { status: 'cancelled' })
               } catch {}
               setPendingBookingId(null)
             }
+            paymentSucceededRef.current = false
           }}
           session={session}
           bookingId={pendingBookingId}
           onPaid={() => {
+            paymentSucceededRef.current = true
             setAlreadyBooked(true)
             setPendingBookingId(null)
           }}
