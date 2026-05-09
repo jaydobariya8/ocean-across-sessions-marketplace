@@ -10,10 +10,10 @@ class TestBookingModel:
         assert user.username in s
         assert session.title in s
 
-    def test_unique_booking_constraint(self, user, session):
-        Booking.objects.create(user=user, session=session, amount_paid=session.price)
-        with pytest.raises(Exception):
-            Booking.objects.create(user=user, session=session, amount_paid=session.price)
+    def test_can_rebook_after_cancellation(self, user, session):
+        b = Booking.objects.create(user=user, session=session, amount_paid=session.price, status='cancelled')
+        b2 = Booking.objects.create(user=user, session=session, amount_paid=session.price)
+        assert b2.pk is not None
 
 
 @pytest.mark.django_db
@@ -124,12 +124,13 @@ class TestSessionCapacity:
             scheduled_at=timezone.now() + timedelta(days=1),
             status=Session.STATUS_PUBLISHED,
         )
-        # first user books
+        # first user books and confirms (capacity counts confirmed only)
         from apps.accounts.models import User
         u1 = User.objects.create_user(username='u1', email='u1@x.com', password='p')
         api_client.force_authenticate(user=u1)
         r1 = api_client.post('/api/bookings/', {'session_id': s.id})
         assert r1.status_code == 201
+        Booking.objects.filter(id=r1.data['id']).update(status='confirmed')
 
         # second user tries to book same full session
         u2 = User.objects.create_user(username='u2', email='u2@x.com', password='p')
